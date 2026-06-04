@@ -1,0 +1,34 @@
+package com.example.currency_exchange_spring.dto.exchangeRateDTO;
+
+import com.example.currency_exchange_spring.entity.Currency;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExchangeRateDTO {
+
+    @NotNull
+    private int id;
+
+    @NotBlank
+    private Currency baseCurrency;
+
+    @NotBlank
+    private Currency targetCurrency;
+
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = false)
+    private BigDecimal rate;
+
+}
