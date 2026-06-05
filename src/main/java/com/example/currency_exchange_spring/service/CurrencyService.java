@@ -1,6 +1,7 @@
 package com.example.currency_exchange_spring.service;
 
 import com.example.currency_exchange_spring.dto.currencyDTO.CreateCurrencyDTO;
+import com.example.currency_exchange_spring.dto.currencyDTO.CurrencyResponceDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
@@ -20,8 +21,9 @@ public class CurrencyService {
     @Autowired
     private CurrencyMapper currencyMapper;
 
-    public Currency createCurrency(CreateCurrencyDTO currency) {
-        return currencyRepository.save(currencyMapper.toEntity(currency));
+    public CurrencyResponceDTO createCurrency(CreateCurrencyDTO currency) {
+        Currency saved = currencyRepository.save(currencyMapper.toEntity(currency));
+        return currencyMapper.toDto(saved);
     }
 
     public List<Currency> getAll() {

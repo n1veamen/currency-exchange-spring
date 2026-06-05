@@ -17,18 +17,18 @@ public class CurrenciesController {
     @Autowired
     private CurrencyService currencyService;
 
-    @Autowired
-    private CurrencyMapper currencyMapper;
-
     @GetMapping
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok( currencyService.getAll() );
+        return ResponseEntity.ok(currencyService.getAll());
     }
 
     @PostMapping
     public ResponseEntity<?> createCurrency(@RequestBody CreateCurrencyDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(currencyService.createCurrency(request));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                currencyService.createCurrency( request )
+        );
+
     }
 
 }
