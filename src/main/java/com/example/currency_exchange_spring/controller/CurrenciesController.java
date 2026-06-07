@@ -3,6 +3,7 @@ package com.example.currency_exchange_spring.controller;
 import com.example.currency_exchange_spring.dto.currencyDTO.CreateCurrencyDTO;
 import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.service.CurrencyService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +18,19 @@ public class CurrenciesController {
     @Autowired
     private CurrencyService currencyService;
 
+    @Autowired
+    CurrencyMapper currencyMapper;
+
     @GetMapping
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(currencyService.getAll());
+        return ResponseEntity.ok(currencyService.getAll().stream( ).map(currencyMapper::toDTO).toList());
     }
 
     @PostMapping
-    public ResponseEntity<?> createCurrency(@RequestBody CreateCurrencyDTO request) {
+    public ResponseEntity<?> createCurrency(@Valid @RequestBody CreateCurrencyDTO request) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                currencyService.createCurrency( request )
+                currencyMapper.toDTO( currencyService.createCurrency(request) )
         );
 
     }

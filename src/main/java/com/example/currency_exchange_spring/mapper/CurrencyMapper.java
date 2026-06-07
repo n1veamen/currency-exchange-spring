@@ -1,7 +1,7 @@
 package com.example.currency_exchange_spring.mapper;
 
 import com.example.currency_exchange_spring.dto.currencyDTO.CreateCurrencyDTO;
-import com.example.currency_exchange_spring.dto.currencyDTO.CurrencyResponceDTO;
+import com.example.currency_exchange_spring.dto.currencyDTO.CurrencyResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import org.mapstruct.Mapper;
 
@@ -10,8 +10,8 @@ public interface CurrencyMapper {
 
     Currency toEntity(CreateCurrencyDTO dto);
 
-    Currency toEntity(CurrencyResponceDTO dto);
+    Currency toEntity(CurrencyResponseDTO dto);
 
-    CurrencyResponceDTO toDto(Currency currency);
+    CurrencyResponseDTO toDTO(Currency currency);
 
 }

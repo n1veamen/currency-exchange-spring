@@ -1,5 +1,6 @@
 package com.example.currency_exchange_spring.controller;
 
+import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CurrencyController {
 
     @Autowired
-    CurrencyService currencyService;
+    private CurrencyService currencyService;
+
+    @Autowired
+    private CurrencyMapper currencyMapper;
 
     @GetMapping("/{code}")
     public ResponseEntity<?> getByCode(@PathVariable String code) {
-        return ResponseEntity.ok( currencyService.getByCode( code ) );
+        return ResponseEntity.ok( currencyMapper.toDTO(currencyService.getByCode( code ) ) );
     }
 
 }

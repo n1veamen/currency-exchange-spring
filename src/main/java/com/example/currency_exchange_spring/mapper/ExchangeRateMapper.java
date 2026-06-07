@@ -11,8 +11,6 @@ public interface ExchangeRateMapper {
 
     ExchangeRate toEntity(ExchangeRateResponseDTO exchangeRateDTO);
 
-    ExchangeRate toEntity(CreateExchangeRateDTO createExchangeRateDTO);
-
     ExchangeRateResponseDTO toDTO(ExchangeRate exchangeRate);
 
     ExchangeRate toEntity(UpdateExchangeRateDTO updateExchangeRateDTO);

@@ -3,8 +3,12 @@ package com.example.currency_exchange_spring.service;
 import com.example.currency_exchange_spring.dto.exchangeRateDTO.CreateExchangeRateDTO;
 import com.example.currency_exchange_spring.dto.exchangeRateDTO.ExchangeRateResponseDTO;
 import com.example.currency_exchange_spring.dto.exchangeRateDTO.UpdateExchangeRateDTO;
+import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
+import com.example.currency_exchange_spring.exception.AlreadyExistsException;
+import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.mapper.ExchangeRateMapper;
+import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
 import com.example.currency_exchange_spring.util.CurrencyPair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,41 +27,75 @@ public class ExchangeRateService {
     @Autowired
     private ExchangeRateMapper exchangeRateMapper;
 
-    public List<ExchangeRateResponseDTO> getAll() {
+    @Autowired
+    private CurrencyService currencyService;
 
-        return rateRepository.findAll().stream()
-                .map(exchangeRateMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<ExchangeRate> getAll() {
+        return rateRepository.findAll();
+    }
+
+    public ExchangeRateResponseDTO getResponseByCurrencyPair(CurrencyPair pair) {
+
+        return exchangeRateMapper.toDTO(getByCurrencyPair(pair)
+            .orElseThrow(
+                    () -> new NotFoundException(
+                        "Exchange rate not found: "
+                        + pair.getBaseCurrencyCode()
+                        + pair.getTargetCurrencyCode()
+                )
+            )
+        );
 
     }
 
-    public Optional<ExchangeRateResponseDTO> getByCurrencyPair(CurrencyPair currencyPair) {
-
+    public Optional<ExchangeRate> getByCurrencyPair(CurrencyPair pair) {
         return rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
-                        currencyPair.getBaseCurrencyCode( ),
-                        currencyPair.getTargetCurrencyCode( )
-                ).map(exchangeRateMapper::toDTO);
-
+                pair.getBaseCurrencyCode(),
+                pair.getTargetCurrencyCode()
+        );
     }
 
     public ExchangeRateResponseDTO update(CurrencyPair currencyPair, UpdateExchangeRateDTO updateExchangeRateDTO) {
 
-        ExchangeRate exchangeRate = rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
-                currencyPair.getBaseCurrencyCode(),
-                currencyPair.getTargetCurrencyCode()
-        ).orElseThrow( () -> new RuntimeException("Not found") );
+        String baseCurrencyCode = currencyPair.getBaseCurrencyCode();
+        String targetCurrencyCode = currencyPair.getTargetCurrencyCode();
 
-        ExchangeRate saved = rateRepository.save(exchangeRate);
+        ExchangeRate exchangeRate = rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
+                baseCurrencyCode,
+                targetCurrencyCode
+        ).orElseThrow( () -> new NotFoundException("Missing required field: " + baseCurrencyCode + targetCurrencyCode) );
+
+        exchangeRate.setRate(updateExchangeRateDTO.getRate());
+
+        ExchangeRate saved = rateRepository.save( exchangeRate );
 
         return exchangeRateMapper.toDTO(saved);
 
     }
 
-    public ExchangeRateResponseDTO create(CreateExchangeRateDTO createExchangeRateDTO) {
+    public ExchangeRate create(CreateExchangeRateDTO dto) {
 
-        ExchangeRate created = rateRepository.save( exchangeRateMapper.toEntity( createExchangeRateDTO ) );
-        return exchangeRateMapper.toDTO(created);
+        Currency baseCurrency = currencyService.getByCode(dto.getBaseCurrencyCode());
+        Currency targetCurrency = currencyService.getByCode(dto.getTargetCurrencyCode());
 
+        checkPairNotExists(dto.getBaseCurrencyCode(), dto.getTargetCurrencyCode());
+
+        ExchangeRate exchangeRate = new ExchangeRate();
+        exchangeRate.setBaseCurrency(baseCurrency);
+        exchangeRate.setTargetCurrency(targetCurrency);
+        exchangeRate.setRate(dto.getRate());
+
+        return rateRepository.save(exchangeRate);
+
+    }
+
+    private void checkPairNotExists(String baseCode, String targetCode) {
+        if (rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
+                baseCode,
+                targetCode
+        ).isPresent() ) {
+            throw new AlreadyExistsException("Exchange rate already exists: " + baseCode + targetCode);
+        }
     }
 
 }
