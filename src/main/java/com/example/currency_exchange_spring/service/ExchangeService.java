@@ -3,6 +3,7 @@ package com.example.currency_exchange_spring.service;
 import com.example.currency_exchange_spring.dto.response.ExchangeResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
+import com.example.currency_exchange_spring.exception.InvalidDataException;
 import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
@@ -26,7 +27,7 @@ public class ExchangeService {
     public ExchangeResponseDTO exchange(String baseCode, String targetCode, BigDecimal amount) {
 
         if (isSameCurrency(baseCode, targetCode)) {
-            throw new ValidationException("Source and target currencies are the same");
+            throw new InvalidDataException("Source and target currencies are the same");
         }
 
         Currency baseCurrency = currencyRepository.findByCode(baseCode)

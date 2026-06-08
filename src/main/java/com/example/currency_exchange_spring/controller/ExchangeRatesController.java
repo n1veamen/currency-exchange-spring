@@ -5,9 +5,11 @@ import com.example.currency_exchange_spring.dto.request.UpdateExchangeRateDTO;
 import com.example.currency_exchange_spring.dto.response.ExchangeRateResponseDTO;
 import com.example.currency_exchange_spring.service.ExchangeRateService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/exchange-rates")
 @RequiredArgsConstructor
+@Validated
 public class ExchangeRatesController {
 
     private final ExchangeRateService exchangeRateService;
@@ -25,7 +28,7 @@ public class ExchangeRatesController {
     }
 
     @GetMapping("/{codePair}")
-    public ResponseEntity<ExchangeRateResponseDTO> getByCodePair(@PathVariable String codePair) {
+    public ResponseEntity<ExchangeRateResponseDTO> getByCodePair(@Pattern(regexp = "[A-Z]{6}") @PathVariable String codePair) {
         return ResponseEntity.ok(exchangeRateService.getByCodePair(codePair));
     }
 
