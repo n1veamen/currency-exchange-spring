@@ -1,0 +1,440 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Currency Exchange Spring API",
+    "description": "Коллекция для тестирования REST API проекта **currency-exchange-spring**.\n\n## Запуск\n1. `mvn spring-boot:run`\n2. Базовый URL: `http://localhost:8080`\n3. БД H2 in-memory — данные сбрасываются при перезапуске\n\n## Порядок тестов\nПапка **00 — Setup (run in order)** → затем остальные сценарии.\n\n## Эндпоинты\n| Метод | Путь | Описание |\n|-------|------|----------|\n| GET | `/currencies` | Все валюты |\n| GET | `/currencies/{code}` | Валюта по коду |\n| POST | `/currencies` | Создать валюту |\n| GET | `/exchange-rates` | Все курсы |\n| GET | `/exchange-rates/{codePair}` | Курс по паре (`USDRUB`) |\n| POST | `/exchange-rates` | Создать курс |\n| PATCH | `/exchange-rates/{codePair}` | Обновить курс |\n| GET | `/exchange` | Конвертация суммы |\n\n## Кросс-курс (`/exchange`)\n1. Прямой курс `base → target`\n2. Обратный курс `target → base` (инверсия `1/rate`)\n3. Через USD: `base → USD → target`\n4. Альтернатива: если оба курса от USD — `USD/target ÷ USD/base`\n\n## Ошибки\n```json\n{ \"status\": 404, \"message\": \"...\" }\n```\n- **404** — не найдено\n- **409** — дубликат\n- **400** — ошибка валидации",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 — Setup (run in order)",
+      "description": "Запускайте запросы сверху вниз на чистой БД. После этого можно тестировать Exchange и негативные сценарии.",
+      "item": [
+        {
+          "name": "1. Create USD",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"USD\",\n  \"fullName\": \"United States Dollar\",\n  \"sign\": \"$\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "Ожидается **201 Created** (без тела)."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create RUB",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"RUB\",\n  \"fullName\": \"Russian Ruble\",\n  \"sign\": \"₽\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "Ожидается **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Create EUR",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"EUR\",\n  \"fullName\": \"Euro\",\n  \"sign\": \"€\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "Ожидается **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Create rate USD → RUB",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"RUB\",\n  \"rate\": 90.50\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "Хаб-курс через USD. Ожидается **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Create rate USD → EUR",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"EUR\",\n  \"rate\": 0.92\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "Ожидается **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "6. Verify — Get all currencies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/currencies",
+            "description": "Проверка: 3 валюты (USD, RUB, EUR)."
+          },
+          "response": []
+        },
+        {
+          "name": "7. Verify — Get all exchange rates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "Проверка: 2 курса (USD/RUB, USD/EUR)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Currencies",
+      "description": "Код валюты: ровно 3 заглавные латинские буквы `[A-Z]{3}`.",
+      "item": [
+        {
+          "name": "Get all currencies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/currencies",
+            "description": "**200 OK** — массив валют.\n\n```json\n[\n  {\n    \"id\": 1,\n    \"code\": \"USD\",\n    \"fullName\": \"United States Dollar\",\n    \"sign\": \"$\"\n  }\n]\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Get currency by code — USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/currencies/USD",
+            "description": "**200 OK** — одна валюта."
+          },
+          "response": []
+        },
+        {
+          "name": "Create currency — GBP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"GBP\",\n  \"fullName\": \"British Pound\",\n  \"sign\": \"£\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "Дополнительная валюта для расширенных тестов. **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "Create currency — duplicate (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"USD\",\n  \"fullName\": \"Duplicate\",\n  \"sign\": \"X\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "**409 Conflict**\n\n```json\n{\n  \"status\": 409,\n  \"message\": \"Currency with this code already exists: USD\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create currency — invalid code (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"usd\",\n  \"fullName\": \"Invalid\",\n  \"sign\": \"$\"\n}"
+            },
+            "url": "{{baseUrl}}/currencies",
+            "description": "Код должен быть `[A-Z]{3}`. **400 Bad Request**."
+          },
+          "response": []
+        },
+        {
+          "name": "Get currency — not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/currencies/XXX",
+            "description": "**404 Not Found**\n\n```json\n{\n  \"status\": 404,\n  \"message\": \"Currency not found: XXX\"\n}\n```"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exchange Rates",
+      "description": "Курсы хранятся как явные пары. `codePair` = 6 символов: base(3) + target(3), например `USDRUB`.",
+      "item": [
+        {
+          "name": "Get all exchange rates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "**200 OK**\n\n```json\n[\n  {\n    \"id\": 1,\n    \"baseCurrency\": { \"id\": 1, \"code\": \"USD\", \"fullName\": \"...\", \"sign\": \"$\" },\n    \"targetCurrency\": { \"id\": 2, \"code\": \"RUB\", \"fullName\": \"...\", \"sign\": \"₽\" },\n    \"rate\": 90.50\n  }\n]\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Get exchange rate by pair — USDRUB",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/exchange-rates/USDRUB",
+            "description": "`USDRUB` = USD → RUB. **200 OK**."
+          },
+          "response": []
+        },
+        {
+          "name": "Get exchange rate by pair — USDEUR",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/exchange-rates/USDEUR",
+            "description": "`USDEUR` = USD → EUR. **200 OK**."
+          },
+          "response": []
+        },
+        {
+          "name": "Create exchange rate — USD → GBP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"GBP\",\n  \"rate\": 0.79\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "Сначала создайте GBP в Currencies. **201 Created**."
+          },
+          "response": []
+        },
+        {
+          "name": "Update exchange rate — USDRUB",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rate\": 95.00\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates/USDRUB",
+            "description": "Обновляет курс пары. **200 OK** — возвращает обновлённый объект."
+          },
+          "response": []
+        },
+        {
+          "name": "Create exchange rate — duplicate (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"RUB\",\n  \"rate\": 90.50\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "**409 Conflict**\n\n```json\n{\n  \"status\": 409,\n  \"message\": \"Exchange rate already exists: USDRUB\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create exchange rate — currency not found (404)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"CAD\",\n  \"rate\": 1.35\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "CAD не существует. **404 Not Found**\n\n```json\n{\n  \"status\": 404,\n  \"message\": \"Currency not found: CAD\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create exchange rate — invalid rate (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baseCurrencyCode\": \"USD\",\n  \"targetCurrencyCode\": \"EUR\",\n  \"rate\": 0\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates",
+            "description": "`rate` должен быть > 0. **400 Bad Request**."
+          },
+          "response": []
+        },
+        {
+          "name": "Get exchange rate — not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/exchange-rates/USDCAD",
+            "description": "**404 Not Found**\n\n```json\n{\n  \"status\": 404,\n  \"message\": \"Exchange rate not found for code pair: USDCAD\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Update exchange rate — not found (404)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rate\": 1.00\n}"
+            },
+            "url": "{{baseUrl}}/exchange-rates/USDCAD",
+            "description": "Пара не существует. **404 Not Found**."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exchange",
+      "description": "Конвертация: `GET /exchange?baseCode=&targetCode=&amount=`\n\nОтвет:\n```json\n{\n  \"baseCurrency\": { ... },\n  \"targetCurrency\": { ... },\n  \"rate\": 90.50,\n  \"amount\": 100,\n  \"convertedAmount\": 9050.00\n}\n```",
+      "item": [
+        {
+          "name": "Exchange — direct USD → RUB",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=USD&targetCode=RUB&amount=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "USD", "description": "Исходная валюта" },
+                { "key": "targetCode", "value": "RUB", "description": "Целевая валюта" },
+                { "key": "amount", "value": "100", "description": "Сумма для конвертации" }
+              ]
+            },
+            "description": "Прямой курс из БД (USD/RUB). **200 OK**.\n\n`convertedAmount = amount × rate`"
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange — reverse RUB → USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=RUB&targetCode=USD&amount=9050",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "RUB" },
+                { "key": "targetCode", "value": "USD" },
+                { "key": "amount", "value": "9050" }
+              ]
+            },
+            "description": "В БД есть USD/RUB, запрашиваем RUB→USD. Курс инвертируется (`1/rate`). **200 OK**."
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange — cross RUB → EUR via USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=RUB&targetCode=EUR&amount=10000",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "RUB" },
+                { "key": "targetCode", "value": "EUR" },
+                { "key": "amount", "value": "10000" }
+              ]
+            },
+            "description": "Кросс-курс через USD.\n\nНужны курсы USD/RUB и USD/EUR.\n\nЛогика: `RUB→USD` (инверсия) × `USD→EUR`.\n\n**200 OK**."
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange — cross EUR → RUB via USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=EUR&targetCode=RUB&amount=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "EUR" },
+                { "key": "targetCode", "value": "RUB" },
+                { "key": "amount", "value": "100" }
+              ]
+            },
+            "description": "Обратный кросс: EUR→USD × USD→RUB (или через USD-ноги). **200 OK**."
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange — currency not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=XXX&targetCode=USD&amount=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "XXX" },
+                { "key": "targetCode", "value": "USD" },
+                { "key": "amount", "value": "100" }
+              ]
+            },
+            "description": "**404 Not Found**\n\n```json\n{\n  \"status\": 404,\n  \"message\": \"Currency not found: XXX\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange — rate not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exchange?baseCode=RUB&targetCode=GBP&amount=1000",
+              "host": ["{{baseUrl}}"],
+              "path": ["exchange"],
+              "query": [
+                { "key": "baseCode", "value": "RUB" },
+                { "key": "targetCode", "value": "GBP" },
+                { "key": "amount", "value": "1000" }
+              ]
+            },
+            "description": "Нет пути к курсу (GBP не заведён или нет USD-связки). **404 Not Found**\n\n```json\n{\n  \"status\": 404,\n  \"message\": \"Exchange rate not found: RUBGBP\"\n}\n```"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

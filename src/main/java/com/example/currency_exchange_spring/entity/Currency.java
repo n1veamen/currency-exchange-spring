@@ -1,4 +1,5 @@
 package com.example.currency_exchange_spring.entity;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

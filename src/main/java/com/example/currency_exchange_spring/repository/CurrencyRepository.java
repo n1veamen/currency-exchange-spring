@@ -8,5 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CurrencyRepository extends JpaRepository<Currency, Integer> {
-    public Optional<Currency> findByCode(String code);
+    Optional<Currency> findByCode(String code);
+
+    boolean existsByCode(String code);
 }

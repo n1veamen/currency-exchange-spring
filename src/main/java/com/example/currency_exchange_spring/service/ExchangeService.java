@@ -1,82 +1,103 @@
 package com.example.currency_exchange_spring.service;
 
-import com.example.currency_exchange_spring.dto.exchangeDTO.ExchangeResponseDTO;
+import com.example.currency_exchange_spring.dto.response.ExchangeResponseDTO;
+import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.NotFoundException;
+import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.currency_exchange_spring.util.BigDecimalUtil;
+import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ExchangeService {
 
-    @Autowired
-    private ExchangeRateRepository rateRepository;
+    private static final String BRIDGE_CURRENCY = "USD";
 
-    @Autowired
-    private CurrencyService currencyService;
+    private final ExchangeRateRepository exchangeRateRepository;
+    private final CurrencyRepository currencyRepository;
 
-    public ExchangeResponseDTO exchange(String from, String to, BigDecimal amount) {
-        from = from.toUpperCase();
-        to = to.toUpperCase();
+    public ExchangeResponseDTO exchange(String baseCode, String targetCode, BigDecimal amount) {
 
-        BigDecimal effectiveRate = findEffectiveRate(from, to);
-        BigDecimal convertedAmount = amount.multiply(effectiveRate);
+        if (isSameCurrency(baseCode, targetCode)) {
+            throw new ValidationException("Source and target currencies are the same");
+        }
 
-        return new ExchangeResponseDTO(
-                currencyService.getByCode(from),
-                currencyService.getByCode(to),
-                effectiveRate,
+        Currency baseCurrency = currencyRepository.findByCode(baseCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + baseCode));
+        Currency targetCurrency = currencyRepository.findByCode(targetCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
+
+        BigDecimal rate = resolveRate(baseCode, targetCode)
+                .orElseThrow(() -> new NotFoundException("Exchange rate not found: " + baseCode + targetCode));
+
+        var response = new ExchangeResponseDTO(
+                baseCurrency,
+                targetCurrency,
+                rate,
                 amount,
-                convertedAmount
+                BigDecimalUtil.multiply(amount, rate)
         );
+
+        return response;
     }
 
-    private BigDecimal findEffectiveRate(String from, String to) {
-        Optional<ExchangeRate> direct = rateRepository
-                .findByBaseCurrencyCodeAndTargetCurrencyCode(from, to);
+    private Optional<BigDecimal> findDirectOrReverseRate(String base, String target) {
 
-        if (direct.isPresent()) {
-            return direct.get().getRate();
+        Optional<ExchangeRate> directRate = exchangeRateRepository
+                .findByBaseCurrency_CodeAndTargetCurrency_Code(base, target);
+        if (directRate.isPresent()) {
+            return Optional.of(directRate.get().getRate());
         }
 
-        Optional<ExchangeRate> reverse = rateRepository
-                .findByBaseCurrencyCodeAndTargetCurrencyCode(to, from);
-
-        if (reverse.isPresent()) {
-            return BigDecimal.ONE.divide(reverse.get().getRate(), 10, RoundingMode.HALF_UP);
+        Optional<ExchangeRate> reverseRate = exchangeRateRepository
+                .findByBaseCurrency_CodeAndTargetCurrency_Code(target, base);
+        if (reverseRate.isPresent()) {
+            return Optional.of(BigDecimalUtil.invert(reverseRate.get().getRate()));
         }
 
-        List<ExchangeRate> firstLegRates = rateRepository.findByBaseCurrencyCode(from);
-
-        for (ExchangeRate firstLeg : firstLegRates) {
-            String intermediate = firstLeg.getTargetCurrency().getCode();
-            BigDecimal rate1 = firstLeg.getRate();
-
-            Optional<ExchangeRate> secondDirect = rateRepository
-                    .findByBaseCurrencyCodeAndTargetCurrencyCode(intermediate, to);
-
-            if (secondDirect.isPresent()) {
-                return rate1.multiply(secondDirect.get().getRate());
-            }
-
-            Optional<ExchangeRate> secondReverse = rateRepository
-                    .findByBaseCurrencyCodeAndTargetCurrencyCode(to, intermediate);
-
-            if (secondReverse.isPresent()) {
-                BigDecimal rate2 = BigDecimal.ONE.divide(
-                        secondReverse.get().getRate(), 10, RoundingMode.HALF_UP
-                );
-                return rate1.multiply(rate2);
-            }
-        }
-
-        throw new NotFoundException("Exchange rate not found for: " + from + " -> " + to);
+        return Optional.empty();
     }
 
+    public Optional<BigDecimal> resolveRate(String baseCode, String targetCode) {
+
+        Optional<BigDecimal> directReverse = findDirectOrReverseRate(baseCode, targetCode);
+        if (directReverse.isPresent()) {
+            return directReverse;
+        }
+
+        Optional<BigDecimal> baseToBridge = findDirectOrReverseRate(baseCode, BRIDGE_CURRENCY);
+        Optional<BigDecimal> bridgeToBase = findDirectOrReverseRate(BRIDGE_CURRENCY, targetCode);
+
+        if (baseToBridge.isPresent() && bridgeToBase.isPresent()) {
+            return Optional.of(
+                    BigDecimalUtil.multiply(
+                            baseToBridge.get(), bridgeToBase.get()
+                    )
+            );
+        }
+
+        Optional<BigDecimal> usdToBase = findDirectOrReverseRate(BRIDGE_CURRENCY, baseCode);
+        Optional<BigDecimal> usdToTarget = findDirectOrReverseRate(BRIDGE_CURRENCY, targetCode);
+
+        if (usdToBase.isPresent() && usdToTarget.isPresent()) {
+            BigDecimal rate = BigDecimalUtil.divide(
+                    usdToTarget.get(), usdToBase.get()
+            );
+
+            return Optional.of(rate);
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isSameCurrency(String from, String to) {
+        return from.equals(to);
+    }
 }

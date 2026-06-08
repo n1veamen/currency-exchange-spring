@@ -1,8 +1,8 @@
 package com.example.currency_exchange_spring.service;
 
-import com.example.currency_exchange_spring.dto.exchangeRateDTO.CreateExchangeRateDTO;
-import com.example.currency_exchange_spring.dto.exchangeRateDTO.ExchangeRateResponseDTO;
-import com.example.currency_exchange_spring.dto.exchangeRateDTO.UpdateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.request.CreateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.request.UpdateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.response.ExchangeRateResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.AlreadyExistsException;
@@ -10,92 +10,74 @@ import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.mapper.ExchangeRateMapper;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
-import com.example.currency_exchange_spring.util.CurrencyPair;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.currency_exchange_spring.util.CurrencyPairParser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ExchangeRateService {
 
-    @Autowired
-    private ExchangeRateRepository rateRepository;
+    private final ExchangeRateRepository exchangeRateRepository;
+    private final ExchangeRateMapper exchangeRateMapper;
+    private final CurrencyRepository currencyRepository;
 
-    @Autowired
-    private ExchangeRateMapper exchangeRateMapper;
+    public List<ExchangeRateResponseDTO> getAll() {
+        var response = exchangeRateRepository.findAll().stream()
+                .map(exchangeRateMapper::toDTO)
+                .collect(Collectors.toList());
 
-    @Autowired
-    private CurrencyService currencyService;
-
-    public List<ExchangeRate> getAll() {
-        return rateRepository.findAll();
+        return response;
     }
 
-    public ExchangeRateResponseDTO getResponseByCurrencyPair(CurrencyPair pair) {
+    public ExchangeRateResponseDTO getByCodePair(String codePair) {
+        var response = exchangeRateRepository.findByBaseCurrency_CodeAndTargetCurrency_Code(
+                        CurrencyPairParser.getBaseCode(codePair),
+                        CurrencyPairParser.getTargetCode(codePair)
+                ).map(exchangeRateMapper::toDTO)
+                .orElseThrow(() -> new NotFoundException("Exchange rate not found for code pair: " + codePair));
 
-        return exchangeRateMapper.toDTO(getByCurrencyPair(pair)
-            .orElseThrow(
-                    () -> new NotFoundException(
-                        "Exchange rate not found: "
-                        + pair.getBaseCurrencyCode()
-                        + pair.getTargetCurrencyCode()
-                )
-            )
-        );
-
+        return response;
     }
 
-    public Optional<ExchangeRate> getByCurrencyPair(CurrencyPair pair) {
-        return rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
-                pair.getBaseCurrencyCode(),
-                pair.getTargetCurrencyCode()
-        );
+    public ExchangeRateResponseDTO update(String codePair, UpdateExchangeRateDTO request) {
+
+        ExchangeRate exchangeRate = exchangeRateRepository.findByBaseCurrency_CodeAndTargetCurrency_Code(
+                CurrencyPairParser.getBaseCode(codePair),
+                CurrencyPairParser.getTargetCode(codePair)
+        ).orElseThrow(() -> new NotFoundException("Exchange rate not found for code pair: " + codePair));
+
+        exchangeRate.setRate(request.getRate());
+
+        ExchangeRate saved = exchangeRateRepository.save(exchangeRate);
+        var response = exchangeRateMapper.toDTO(saved);
+
+        return response;
     }
 
-    public ExchangeRateResponseDTO update(CurrencyPair currencyPair, UpdateExchangeRateDTO updateExchangeRateDTO) {
+    public void create(CreateExchangeRateDTO request) {
 
-        String baseCurrencyCode = currencyPair.getBaseCurrencyCode();
-        String targetCurrencyCode = currencyPair.getTargetCurrencyCode();
+        String baseCode = request.getBaseCurrencyCode();
+        String targetCode = request.getTargetCurrencyCode();
 
-        ExchangeRate exchangeRate = rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
-                baseCurrencyCode,
-                targetCurrencyCode
-        ).orElseThrow( () -> new NotFoundException("Missing required field: " + baseCurrencyCode + targetCurrencyCode) );
-
-        exchangeRate.setRate(updateExchangeRateDTO.getRate());
-
-        ExchangeRate saved = rateRepository.save( exchangeRate );
-
-        return exchangeRateMapper.toDTO(saved);
-
-    }
-
-    public ExchangeRate create(CreateExchangeRateDTO dto) {
-
-        Currency baseCurrency = currencyService.getByCode(dto.getBaseCurrencyCode());
-        Currency targetCurrency = currencyService.getByCode(dto.getTargetCurrencyCode());
-
-        checkPairNotExists(dto.getBaseCurrencyCode(), dto.getTargetCurrencyCode());
-
-        ExchangeRate exchangeRate = new ExchangeRate();
-        exchangeRate.setBaseCurrency(baseCurrency);
-        exchangeRate.setTargetCurrency(targetCurrency);
-        exchangeRate.setRate(dto.getRate());
-
-        return rateRepository.save(exchangeRate);
-
-    }
-
-    private void checkPairNotExists(String baseCode, String targetCode) {
-        if (rateRepository.findByBaseCurrencyCodeAndTargetCurrencyCode(
-                baseCode,
-                targetCode
-        ).isPresent() ) {
+        if (exchangeRateRepository.existsByBaseCurrency_CodeAndTargetCurrency_Code(baseCode, targetCode)) {
             throw new AlreadyExistsException("Exchange rate already exists: " + baseCode + targetCode);
         }
+
+        Currency baseCurrency = currencyRepository.findByCode(baseCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + baseCode));
+        Currency targetCurrency = currencyRepository.findByCode(targetCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
+
+        ExchangeRate rate = new ExchangeRate();
+        rate.setBaseCurrency(baseCurrency);
+        rate.setTargetCurrency(targetCurrency);
+        rate.setRate(request.getRate());
+
+        exchangeRateRepository.save(rate);
     }
 
 }

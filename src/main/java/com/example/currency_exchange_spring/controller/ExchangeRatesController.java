@@ -1,37 +1,47 @@
 package com.example.currency_exchange_spring.controller;
 
-import com.example.currency_exchange_spring.dto.exchangeRateDTO.CreateExchangeRateDTO;
-import com.example.currency_exchange_spring.mapper.ExchangeRateMapper;
+import com.example.currency_exchange_spring.dto.request.CreateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.request.UpdateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.response.ExchangeRateResponseDTO;
 import com.example.currency_exchange_spring.service.ExchangeRateService;
-import com.example.currency_exchange_spring.util.CurrencyPair;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/exchangeRates")
+@RequestMapping("/exchange-rates")
+@RequiredArgsConstructor
 public class ExchangeRatesController {
 
-    @Autowired
-    private ExchangeRateService exchangeRateService;
-
-    @Autowired
-    private ExchangeRateMapper exchangeRateMapper;
+    private final ExchangeRateService exchangeRateService;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(exchangeRateService.getAll().stream( ).map(exchangeRateMapper::toDTO).toList());
+    public ResponseEntity<List<ExchangeRateResponseDTO>> getAll() {
+        return ResponseEntity.ok(exchangeRateService.getAll());
+    }
+
+    @GetMapping("/{codePair}")
+    public ResponseEntity<ExchangeRateResponseDTO> getByCodePair(@PathVariable String codePair) {
+        return ResponseEntity.ok(exchangeRateService.getByCodePair(codePair));
     }
 
     @PostMapping
-    public ResponseEntity<?> createExchangeRate(@Valid @RequestBody CreateExchangeRateDTO createExchangeRateDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                exchangeRateMapper.toDTO(
-                        exchangeRateService.create( createExchangeRateDTO )
-                )
+    public ResponseEntity<Void> createExchangeRate(@Valid @RequestBody CreateExchangeRateDTO request) {
+        exchangeRateService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/{codePair}")
+    public ResponseEntity<ExchangeRateResponseDTO> updateByCode(
+            @PathVariable String codePair,
+            @Valid @RequestBody UpdateExchangeRateDTO request
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                exchangeRateService.update(codePair, request)
         );
     }
 

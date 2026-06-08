@@ -1,4 +1,4 @@
-package com.example.currency_exchange_spring.dto.exchangeRateDTO;
+package com.example.currency_exchange_spring.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
