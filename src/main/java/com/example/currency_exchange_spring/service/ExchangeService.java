@@ -8,7 +8,6 @@ import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
 import com.example.currency_exchange_spring.util.BigDecimalUtil;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

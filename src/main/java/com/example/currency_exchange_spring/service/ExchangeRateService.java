@@ -72,12 +72,12 @@ public class ExchangeRateService {
         Currency targetCurrency = currencyRepository.findByCode(targetCode)
                 .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
 
-        ExchangeRate rate = new ExchangeRate();
-        rate.setBaseCurrency(baseCurrency);
-        rate.setTargetCurrency(targetCurrency);
-        rate.setRate(request.getRate());
+        var result = new ExchangeRate();
+        result.setBaseCurrency(baseCurrency);
+        result.setTargetCurrency(targetCurrency);
+        result.setRate(request.getRate());
 
-        exchangeRateRepository.save(rate);
+        exchangeRateRepository.save(result);
     }
 
 }
