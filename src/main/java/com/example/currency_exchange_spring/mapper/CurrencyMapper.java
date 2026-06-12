@@ -10,8 +10,6 @@ public interface CurrencyMapper {
 
     Currency toEntity(CreateCurrencyDTO dto);
 
-    Currency toEntity(CurrencyResponseDTO dto);
-
     CurrencyResponseDTO toDTO(Currency currency);
 
 }

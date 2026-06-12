@@ -18,12 +18,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ExchangeService {
 
-    private static final String BRIDGE_CURRENCY = "USD";
-
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    public ExchangeResponseDTO exchange(String baseCode, String targetCode, BigDecimal amount) {
+    public ExchangeResponseDTO exchange(String baseCode, String targetCode, String bridgeCode, BigDecimal amount) {
 
         if (isSameCurrency(baseCode, targetCode)) {
             throw new InvalidDataException("Source and target currencies are the same");
@@ -33,8 +31,10 @@ public class ExchangeService {
                 .orElseThrow(() -> new NotFoundException("Currency not found: " + baseCode));
         Currency targetCurrency = currencyRepository.findByCode(targetCode)
                 .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
+        Currency bridgeCurrency = currencyRepository.findByCode(bridgeCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
 
-        BigDecimal rate = resolveRate(baseCode, targetCode)
+        BigDecimal rate = resolveRate(baseCode, targetCode, bridgeCode)
                 .orElseThrow(() -> new NotFoundException("Exchange rate not found: " + baseCode + targetCode));
 
         var response = new ExchangeResponseDTO(
@@ -65,15 +65,15 @@ public class ExchangeService {
         return Optional.empty();
     }
 
-    public Optional<BigDecimal> resolveRate(String baseCode, String targetCode) {
+    public Optional<BigDecimal> resolveRate(String baseCode, String targetCode, String bridgeCode) {
 
         Optional<BigDecimal> directReverse = findDirectOrReverseRate(baseCode, targetCode);
         if (directReverse.isPresent()) {
             return directReverse;
         }
 
-        Optional<BigDecimal> baseToBridge = findDirectOrReverseRate(baseCode, BRIDGE_CURRENCY);
-        Optional<BigDecimal> bridgeToBase = findDirectOrReverseRate(BRIDGE_CURRENCY, targetCode);
+        Optional<BigDecimal> baseToBridge = findDirectOrReverseRate(baseCode, bridgeCode);
+        Optional<BigDecimal> bridgeToBase = findDirectOrReverseRate(bridgeCode, targetCode);
 
         if (baseToBridge.isPresent() && bridgeToBase.isPresent()) {
             return Optional.of(
@@ -83,8 +83,8 @@ public class ExchangeService {
             );
         }
 
-        Optional<BigDecimal> usdToBase = findDirectOrReverseRate(BRIDGE_CURRENCY, baseCode);
-        Optional<BigDecimal> usdToTarget = findDirectOrReverseRate(BRIDGE_CURRENCY, targetCode);
+        Optional<BigDecimal> usdToBase = findDirectOrReverseRate(bridgeCode, baseCode);
+        Optional<BigDecimal> usdToTarget = findDirectOrReverseRate(bridgeCode, targetCode);
 
         if (usdToBase.isPresent() && usdToTarget.isPresent()) {
             BigDecimal rate = BigDecimalUtil.divide(

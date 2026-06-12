@@ -24,11 +24,12 @@ public class ExchangeController {
 
     @GetMapping
     public ResponseEntity<ExchangeResponseDTO> getExchange(
-            @RequestParam @Pattern(regexp = "[A-Z]{3}") String baseCode,
-            @RequestParam @Pattern(regexp = "[A-Z]{3}") String targetCode,
+            @RequestParam("baseCode") @Pattern(regexp = "[A-Z]{3}") String baseCode,
+            @RequestParam("targetCode") @Pattern(regexp = "[A-Z]{3}") String targetCode,
+            @RequestParam("bridgeCode") @Pattern(regexp = "[A-Z]{3}") String bridgeCode,
             @RequestParam @Positive BigDecimal amount
     ) {
-        return ResponseEntity.ok(exchangeService.exchange(baseCode, targetCode, amount));
+        return ResponseEntity.ok(exchangeService.exchange(baseCode, targetCode, bridgeCode, amount));
     }
 
 }
