@@ -1,4 +1,4 @@
-package com.example.currency_exchange_spring.dto.response;
+package com.example.currency_exchange_spring.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

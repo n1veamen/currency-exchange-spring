@@ -1,7 +1,7 @@
 package com.example.currency_exchange_spring.service;
 
-import com.example.currency_exchange_spring.dto.request.CreateCurrencyDTO;
-import com.example.currency_exchange_spring.dto.response.CurrencyResponseDTO;
+import com.example.currency_exchange_spring.dto.CreateCurrencyDTO;
+import com.example.currency_exchange_spring.dto.CurrencyResponseDTO;
 import com.example.currency_exchange_spring.exception.AlreadyExistsException;
 import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.mapper.CurrencyMapper;

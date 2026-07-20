@@ -1,6 +1,6 @@
 package com.example.currency_exchange_spring.service;
 
-import com.example.currency_exchange_spring.dto.response.ExchangeResponseDTO;
+import com.example.currency_exchange_spring.dto.ExchangeResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.InvalidDataException;

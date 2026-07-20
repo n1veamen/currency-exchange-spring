@@ -1,7 +1,7 @@
 package com.example.currency_exchange_spring.controller;
 
-import com.example.currency_exchange_spring.dto.request.CreateCurrencyDTO;
-import com.example.currency_exchange_spring.dto.response.CurrencyResponseDTO;
+import com.example.currency_exchange_spring.dto.CreateCurrencyDTO;
+import com.example.currency_exchange_spring.dto.CurrencyResponseDTO;
 import com.example.currency_exchange_spring.service.CurrencyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

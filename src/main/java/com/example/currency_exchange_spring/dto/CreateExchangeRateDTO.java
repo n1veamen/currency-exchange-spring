@@ -1,6 +1,7 @@
-package com.example.currency_exchange_spring.dto.request;
+package com.example.currency_exchange_spring.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,13 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateExchangeRateDTO {
+public class CreateExchangeRateDTO {
+
+    @NotBlank
+    private String baseCurrencyCode;
+
+    @NotBlank
+    private String targetCurrencyCode;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)

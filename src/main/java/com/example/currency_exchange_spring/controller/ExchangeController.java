@@ -1,6 +1,6 @@
 package com.example.currency_exchange_spring.controller;
 
-import com.example.currency_exchange_spring.dto.response.ExchangeResponseDTO;
+import com.example.currency_exchange_spring.dto.ExchangeResponseDTO;
 import com.example.currency_exchange_spring.service.ExchangeService;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;

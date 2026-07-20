@@ -1,4 +1,4 @@
-package com.example.currency_exchange_spring.dto.request;
+package com.example.currency_exchange_spring.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

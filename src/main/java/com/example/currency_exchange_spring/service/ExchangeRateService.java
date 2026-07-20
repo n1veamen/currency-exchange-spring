@@ -1,8 +1,8 @@
 package com.example.currency_exchange_spring.service;
 
-import com.example.currency_exchange_spring.dto.request.CreateExchangeRateDTO;
-import com.example.currency_exchange_spring.dto.request.UpdateExchangeRateDTO;
-import com.example.currency_exchange_spring.dto.response.ExchangeRateResponseDTO;
+import com.example.currency_exchange_spring.dto.CreateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.UpdateExchangeRateDTO;
+import com.example.currency_exchange_spring.dto.ExchangeRateResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.AlreadyExistsException;
