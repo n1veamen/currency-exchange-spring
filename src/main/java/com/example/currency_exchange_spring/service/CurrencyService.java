@@ -7,6 +7,7 @@ import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,7 +41,9 @@ public class CurrencyService {
     public CurrencyResponseDTO getByCode(String code) {
         var response = currencyRepository.findByCode(code)
                 .map(currencyMapper::toDTO)
-                .orElseThrow(() -> new NotFoundException("Currency not found: " + code));
+                .orElseThrow(() -> {
+                    return new NotFoundException("Currency not found: " + code);
+                });
 
         return response;
     }

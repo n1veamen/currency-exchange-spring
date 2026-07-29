@@ -12,6 +12,7 @@ import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
 import com.example.currency_exchange_spring.util.CurrencyPairParser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ExchangeRateService {
     private final CurrencyRepository currencyRepository;
 
     public List<ExchangeRateResponseDTO> getAll() {
+
         var response = exchangeRateRepository.findAll().stream()
                 .map(exchangeRateMapper::toDTO)
                 .collect(Collectors.toList());
