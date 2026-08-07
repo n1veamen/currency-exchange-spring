@@ -98,3 +98,58 @@
 2026-08-07T23:31:18.400+05:00  INFO 28900 --- [currency-exchange-spring] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-08-07T23:31:18.402+05:00  INFO 28900 --- [currency-exchange-spring] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2026-08-07T23:31:18.405+05:00  INFO 28900 --- [currency-exchange-spring] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-07T23:42:42.076+05:00  INFO 10928 --- [currency-exchange-spring] [main] c.e.c.CurrencyExchangeSpringApplication  : Starting CurrencyExchangeSpringApplication using Java 24.0.1 with PID 10928 (C:\vsc\projects\java\javalearn\currency-exchange-spring\target\classes started by UltraKazah in C:\vsc\projects\java\javalearn\currency-exchange-spring)
+2026-08-07T23:42:42.079+05:00 DEBUG 10928 --- [currency-exchange-spring] [main] c.e.c.CurrencyExchangeSpringApplication  : Running with Spring Boot v4.0.6, Spring v7.0.7
+2026-08-07T23:42:42.079+05:00  INFO 10928 --- [currency-exchange-spring] [main] c.e.c.CurrencyExchangeSpringApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-08-07T23:42:42.885+05:00  INFO 10928 --- [currency-exchange-spring] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-07T23:42:42.959+05:00  INFO 10928 --- [currency-exchange-spring] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 61 ms. Found 2 JPA repository interfaces.
+2026-08-07T23:42:43.636+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-07T23:42:43.657+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-07T23:42:43.657+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-08-07T23:42:43.733+05:00  INFO 10928 --- [currency-exchange-spring] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1608 ms
+2026-08-07T23:42:43.983+05:00  INFO 10928 --- [currency-exchange-spring] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-07T23:42:44.054+05:00  INFO 10928 --- [currency-exchange-spring] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-08-07T23:42:44.599+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-07T23:42:44.635+05:00  INFO 10928 --- [currency-exchange-spring] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-07T23:42:44.808+05:00  INFO 10928 --- [currency-exchange-spring] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-08-07T23:42:44.810+05:00  INFO 10928 --- [currency-exchange-spring] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-07T23:42:44.875+05:00  INFO 10928 --- [currency-exchange-spring] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:testdb]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: TESTDB/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-07T23:42:45.726+05:00  INFO 10928 --- [currency-exchange-spring] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-07T23:42:45.791+05:00  INFO 10928 --- [currency-exchange-spring] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-07T23:42:45.957+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-07T23:42:46.356+05:00  WARN 10928 --- [currency-exchange-spring] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-07T23:42:46.797+05:00  INFO 10928 --- [currency-exchange-spring] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-08-07T23:42:46.802+05:00  INFO 10928 --- [currency-exchange-spring] [main] c.e.c.CurrencyExchangeSpringApplication  : Started CurrencyExchangeSpringApplication in 5.262 seconds (process running for 5.786)
+2026-08-07T23:42:55.355+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-07T23:42:55.355+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-07T23:42:55.357+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-08-07T23:42:55.527+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-2] c.e.c.aspect.LoggingAspect               : Запрос: CurrenciesController.createCurrency(..)
+2026-08-07T23:42:56.062+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-2] c.e.c.aspect.LoggingAspect               : Ответ (535 мс): CurrenciesController.createCurrency(..)
+2026-08-07T23:42:59.917+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-3] c.e.c.aspect.LoggingAspect               : Запрос: CurrenciesController.createCurrency(..)
+2026-08-07T23:42:59.920+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-3] c.e.c.aspect.LoggingAspect               : Ответ (3 мс): CurrenciesController.createCurrency(..)
+2026-08-07T23:43:03.588+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-4] c.e.c.aspect.LoggingAspect               : Запрос: ExchangeRatesController.createExchangeRate(..)
+2026-08-07T23:43:03.682+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-4] c.e.c.aspect.LoggingAspect               : Ответ (94 мс): ExchangeRatesController.createExchangeRate(..)
+2026-08-07T23:43:05.769+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-5] c.e.c.aspect.LoggingAspect               : Запрос: ExchangeRatesController.getAll()
+2026-08-07T23:43:05.795+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-5] c.e.c.aspect.LoggingAspect               : Ответ (25 мс): ExchangeRatesController.getAll()
+2026-08-07T23:43:08.971+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-6] c.e.c.aspect.LoggingAspect               : Запрос: ExchangeRatesController.getAll()
+2026-08-07T23:43:08.974+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-6] c.e.c.aspect.LoggingAspect               : Ответ (2 мс): ExchangeRatesController.getAll()
+2026-08-07T23:44:56.596+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-9] c.e.c.aspect.LoggingAspect               : Запрос: ExchangeRatesController.updateByCode(..)
+2026-08-07T23:44:56.615+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-9] c.e.c.aspect.LoggingAspect               : Ответ (19 мс): ExchangeRatesController.updateByCode(..)
+2026-08-07T23:45:10.836+05:00  INFO 10928 --- [currency-exchange-spring] [http-nio-8080-exec-10] c.e.c.aspect.LoggingAspect               : Запрос: ExchangeRatesController.updateByCode(..)
+2026-08-07T23:45:10.841+05:00  WARN 10928 --- [currency-exchange-spring] [http-nio-8080-exec-10] c.e.c.exception.GlobalExceptionHandler   : 404 Exchange rate not found for code pair: USDCAD
+2026-08-07T23:45:21.129+05:00  INFO 10928 --- [currency-exchange-spring] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-07T23:45:21.133+05:00  INFO 10928 --- [currency-exchange-spring] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-07T23:45:21.136+05:00  INFO 10928 --- [currency-exchange-spring] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-07T23:45:21.138+05:00  INFO 10928 --- [currency-exchange-spring] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-07T23:45:21.140+05:00  INFO 10928 --- [currency-exchange-spring] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

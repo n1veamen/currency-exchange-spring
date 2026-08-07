@@ -1,10 +1,12 @@
 package com.example.currency_exchange_spring.service;
 
+import com.example.currency_exchange_spring.dto.CurrencyResponseDTO;
 import com.example.currency_exchange_spring.dto.ExchangeResponseDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.InvalidDataException;
 import com.example.currency_exchange_spring.exception.NotFoundException;
+import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
 import com.example.currency_exchange_spring.util.BigDecimalUtil;
@@ -20,6 +22,7 @@ public class ExchangeService {
 
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyRepository currencyRepository;
+    private final CurrencyMapper currencyMapper;
 
     public ExchangeResponseDTO exchange(String baseCode, String targetCode, String bridgeCode, BigDecimal amount) {
 
@@ -27,12 +30,14 @@ public class ExchangeService {
             throw new InvalidDataException("Source and target currencies are the same");
         }
 
-        Currency baseCurrency = currencyRepository.findByCode(baseCode)
-                .orElseThrow(() -> new NotFoundException("Currency not found: " + baseCode));
-        Currency targetCurrency = currencyRepository.findByCode(targetCode)
-                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
+        CurrencyResponseDTO baseCurrency = currencyMapper.toDTO(currencyRepository.findByCode(baseCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + baseCode)));
+
+        CurrencyResponseDTO targetCurrency = currencyMapper.toDTO(currencyRepository.findByCode(targetCode)
+                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode)));
+
         Currency bridgeCurrency = currencyRepository.findByCode(bridgeCode)
-                .orElseThrow(() -> new NotFoundException("Currency not found: " + targetCode));
+                .orElseThrow(() -> new NotFoundException("Bridge currency not found: " + bridgeCode));
 
         BigDecimal rate = resolveRate(baseCode, targetCode, bridgeCode)
                 .orElseThrow(() -> new NotFoundException("Exchange rate not found: " + baseCode + targetCode));
