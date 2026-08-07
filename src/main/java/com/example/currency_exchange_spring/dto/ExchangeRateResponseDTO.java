@@ -14,9 +14,9 @@ public class ExchangeRateResponseDTO {
 
     private int id;
 
-    private Currency baseCurrency;
+    private CurrencyResponseDTO baseCurrency;
 
-    private Currency targetCurrency;
+    private CurrencyResponseDTO targetCurrency;
 
     private BigDecimal rate;
 

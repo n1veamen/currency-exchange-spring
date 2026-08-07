@@ -73,25 +73,14 @@ public class ExchangeService {
         }
 
         Optional<BigDecimal> baseToBridge = findDirectOrReverseRate(baseCode, bridgeCode);
-        Optional<BigDecimal> bridgeToBase = findDirectOrReverseRate(bridgeCode, targetCode);
+        Optional<BigDecimal> bridgeToTarget = findDirectOrReverseRate(bridgeCode, targetCode);
 
-        if (baseToBridge.isPresent() && bridgeToBase.isPresent()) {
+        if (baseToBridge.isPresent() && bridgeToTarget.isPresent()) {
             return Optional.of(
                     BigDecimalUtil.multiply(
-                            baseToBridge.get(), bridgeToBase.get()
+                            baseToBridge.get(), bridgeToTarget.get()
                     )
             );
-        }
-
-        Optional<BigDecimal> usdToBase = findDirectOrReverseRate(bridgeCode, baseCode);
-        Optional<BigDecimal> usdToTarget = findDirectOrReverseRate(bridgeCode, targetCode);
-
-        if (usdToBase.isPresent() && usdToTarget.isPresent()) {
-            BigDecimal rate = BigDecimalUtil.divide(
-                    usdToTarget.get(), usdToBase.get()
-            );
-
-            return Optional.of(rate);
         }
 
         return Optional.empty();

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         String message = e.getBindingResult()
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> handleNotFound(NotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e) {
         HttpStatus status = HttpStatus.NOT_FOUND;
 
         log.warn("{} {}", status.value(), e.getMessage());
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> handleAlreadyExists(AlreadyExistsException e) {
         HttpStatus status = HttpStatus.CONFLICT;
 
         log.warn("{} {}", status.value(), e.getMessage());
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleAll(Exception e) {
+    public ResponseEntity<ErrorResponse> handleAll(Exception e) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         log.error("{} {}", status.value(), e.getMessage());

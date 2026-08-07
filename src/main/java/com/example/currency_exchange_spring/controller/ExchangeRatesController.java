@@ -1,8 +1,8 @@
 package com.example.currency_exchange_spring.controller;
 
 import com.example.currency_exchange_spring.dto.CreateExchangeRateDTO;
-import com.example.currency_exchange_spring.dto.UpdateExchangeRateDTO;
 import com.example.currency_exchange_spring.dto.ExchangeRateResponseDTO;
+import com.example.currency_exchange_spring.dto.UpdateExchangeRateDTO;
 import com.example.currency_exchange_spring.service.ExchangeRateService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -40,7 +40,7 @@ public class ExchangeRatesController {
 
     @PatchMapping("/{codePair}")
     public ResponseEntity<ExchangeRateResponseDTO> updateByCode(
-            @PathVariable String codePair,
+            @Pattern(regexp = "[A-Z]{6}") @PathVariable String codePair,
             @Valid @RequestBody UpdateExchangeRateDTO request
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(

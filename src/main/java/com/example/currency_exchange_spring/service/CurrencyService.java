@@ -7,7 +7,6 @@ import com.example.currency_exchange_spring.exception.NotFoundException;
 import com.example.currency_exchange_spring.mapper.CurrencyMapper;
 import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

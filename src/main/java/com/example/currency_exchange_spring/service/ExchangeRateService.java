@@ -1,8 +1,8 @@
 package com.example.currency_exchange_spring.service;
 
 import com.example.currency_exchange_spring.dto.CreateExchangeRateDTO;
-import com.example.currency_exchange_spring.dto.UpdateExchangeRateDTO;
 import com.example.currency_exchange_spring.dto.ExchangeRateResponseDTO;
+import com.example.currency_exchange_spring.dto.UpdateExchangeRateDTO;
 import com.example.currency_exchange_spring.entity.Currency;
 import com.example.currency_exchange_spring.entity.ExchangeRate;
 import com.example.currency_exchange_spring.exception.AlreadyExistsException;
@@ -12,7 +12,6 @@ import com.example.currency_exchange_spring.repository.CurrencyRepository;
 import com.example.currency_exchange_spring.repository.ExchangeRateRepository;
 import com.example.currency_exchange_spring.util.CurrencyPairParser;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
