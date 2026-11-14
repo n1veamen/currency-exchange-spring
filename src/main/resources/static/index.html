@@ -1,180 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.css" />
-    <title>Currency Exchange Service</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <title>Обмен валют</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div class="container">
-    <h1 class="mb-4">Currency Exchange Service</h1>
+<main class="container app-shell">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">CURRENCY EXCHANGE</p>
+            <h1>Обмен валют</h1>
+            <p class="page-description">Курсы валют и быстрый пересчёт в одном месте.</p>
+        </div>
+        <div class="status-badge"><span class="status-dot"></span> Сервис обмена</div>
+    </header>
 
-    <section class="mt-xxl-5">
-        <div class="row">
-            <div class="col col-6">
-                <h4>Available Currencies</h4>
-                <table class="table currencies-table">
+    <section class="panel" aria-labelledby="convert-heading">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">КОНВЕРТЕР</p>
+                <h2 id="convert-heading">Рассчитать обмен</h2>
+            </div>
+        </div>
+        <form id="convert">
+            <div class="converter-grid">
+                <div class="form-field">
+                    <label for="convert-base-currency">Из валюты</label>
+                    <select class="form-select" id="convert-base-currency" required></select>
+                </div>
+                <div class="swap-mark" aria-hidden="true">→</div>
+                <div class="form-field">
+                    <label for="convert-target-currency">В валюту</label>
+                    <select class="form-select" id="convert-target-currency" required></select>
+                </div>
+                <div class="form-field">
+                    <label for="convert-bridge-currency">Валюта-посредник</label>
+                    <select class="form-select" id="convert-bridge-currency" required></select>
+                </div>
+                <div class="form-field">
+                    <label for="convert-amount">Сумма</label>
+                    <input class="form-control" id="convert-amount" type="number" min="0.000001" step="any"
+                           placeholder="Например, 100" required>
+                </div>
+                <button class="btn btn-primary convert-button" type="submit">Рассчитать <span aria-hidden="true">→</span></button>
+            </div>
+            <output class="conversion-result" id="convert-result" aria-live="polite"></output>
+        </form>
+    </section>
+
+    <div class="content-grid">
+        <section class="panel" aria-labelledby="currencies-heading">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">СПРАВОЧНИК</p>
+                    <h2 id="currencies-heading">Валюты</h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table data-table currencies-table">
                     <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Sign</th>
-                    </tr>
+                    <tr><th>Код</th><th>Название</th><th>Знак</th></tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>USD</td>
-                        <td>US Dollar</td>
-                        <td>$</td>
-                    </tr>
-                    </tbody>
+                    <tbody><tr><td colspan="3" class="empty-state">Загрузка валют…</td></tr></tbody>
                 </table>
             </div>
 
-            <div class="col col-6">
-                <h4>Add New Currency</h4>
-                <form id="add-currency">
-                    <div class="form-group mt-3">
-                        <label for="add-currency-code">Code</label>
-                        <input type="text" name="code" placeholder="USD" class="form-control form-control-sm currency-code" id="add-currency-code">
+            <details class="form-disclosure">
+                <summary>Добавить валюту</summary>
+                <form id="add-currency" class="stacked-form">
+                    <div class="form-field">
+                        <label for="add-currency-code">Код валюты</label>
+                        <input class="form-control" id="add-currency-code" name="code" placeholder="USD"
+                               pattern="[A-Z]{3}" maxlength="3" autocomplete="off" required>
+                        <small class="form-hint">Три заглавные латинские буквы</small>
                     </div>
-                    <div class="form-group mt-3">
-                        <label for="add-currency-name">Name</label>
-                        <input type="text" name="name" placeholder="US Dollar" class="form-control form-control-sm" id="add-currency-name">
+                    <div class="form-field">
+                        <label for="add-currency-name">Название</label>
+                        <input class="form-control" id="add-currency-name" name="fullName"
+                               placeholder="Доллар США" required>
                     </div>
-                    <div class="form-group mt-3">
-                        <label for="add-currency-sign">Sign</label>
-                        <input type="text" name="sign" placeholder="$" class="form-control form-control-sm" id="add-currency-sign">
+                    <div class="form-field">
+                        <label for="add-currency-sign">Знак</label>
+                        <input class="form-control" id="add-currency-sign" name="sign" placeholder="$" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm mt-4">Add Currency</button>
+                    <button class="btn btn-outline-primary" type="submit">Добавить валюту</button>
                 </form>
+            </details>
+        </section>
+
+        <section class="panel" aria-labelledby="rates-heading">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">АКТУАЛЬНЫЕ ДАННЫЕ</p>
+                    <h2 id="rates-heading">Курсы обмена</h2>
+                </div>
             </div>
+            <div class="table-responsive">
+                <table class="table data-table exchange-rates-table">
+                    <thead>
+                    <tr><th>Пара</th><th>Курс</th><th><span class="visually-hidden">Действия</span></th></tr>
+                    </thead>
+                    <tbody><tr><td colspan="3" class="empty-state">Загрузка курсов…</td></tr></tbody>
+                </table>
+            </div>
+
+            <details class="form-disclosure">
+                <summary>Добавить курс</summary>
+                <form id="add-exchange-rate" class="stacked-form">
+                    <div class="form-field">
+                        <label for="new-rate-base-currency">Базовая валюта</label>
+                        <select class="form-select" name="baseCurrencyCode" id="new-rate-base-currency" required></select>
+                    </div>
+                    <div class="form-field">
+                        <label for="new-rate-target-currency">Целевая валюта</label>
+                        <select class="form-select" name="targetCurrencyCode" id="new-rate-target-currency" required></select>
+                    </div>
+                    <div class="form-field">
+                        <label for="exchange-rate">Курс</label>
+                        <input class="form-control" id="exchange-rate" name="rate" type="number"
+                               min="0.000001" step="any" placeholder="Например, 92.5" required>
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit">Добавить курс</button>
+                </form>
+            </details>
+        </section>
+    </div>
+</main>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="api-toast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="api-toast-title">Сообщение</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
         </div>
-    </section>
+        <div class="toast-body" id="api-toast-message"></div>
+    </div>
+</div>
 
-    <section class="mt-xxl-5">
-        <h2>Exchange Rates</h2>
-        <table class="table exchange-rates-table">
-            <thead>
-                <tr>
-                    <th>Currency</th>
-                    <th>Exchange Rate</th>
-                    <th>Edit</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>USDRUB</td>
-                    <td>1.00</td>
-                    <td>
-                        <button type="button" class="btn btn-secondary btn-sm exchange-rate-edit" data-bs-toggle="modal"
-                                data-bs-target="#edit-exchange-rate-modal">Edit</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- Edit exchange rate modal -->
-    <div class="modal fade" id="edit-exchange-rate-modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
+<div class="modal fade" id="edit-exchange-rate-modal" tabindex="-1" aria-labelledby="edit-rate-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="edit-exchange-rate">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Exchange Rate</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title fs-5" id="edit-rate-title">Изменить курс</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="exchange-rate-input">Exchange Rate:</label>
-                            <input type="text" class="form-control" id="exchange-rate-input" value="1.00">
-                        </div>
-                    </form>
+                    <label class="form-label" for="exchange-rate-input">Новый курс</label>
+                    <input class="form-control" id="exchange-rate-input" type="number" min="0.000001"
+                           step="any" required>
+                    <input id="edit-rate-pair" type="hidden">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <section class="mt-xxl-5 pb-5">
-        <div class="row">
-            <div class="col col-6">
-                <h2>Add New Exchange Rate</h2>
-                <form id="add-exchange-rate">
-                    <div class="form-group">
-                        <label for="new-rate-base-currency">Base currency</label>
-                        <select class="form-control" name="baseCurrencyCode" id="new-rate-base-currency">
-                            <option value="USD">USD</option>
-                        </select>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="new-rate-target-currency">Target currency</label>
-                        <select class="form-control" name="targetCurrencyCode" id="new-rate-target-currency">
-                            <option value="USD">USD</option>
-                        </select>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="exchange-rate">Exchange Rate</label>
-                        <input type="text" placeholder="1.23" class="form-control" name="rate" id="exchange-rate">
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Add Exchange Rate</button>
-                </form>
-            </div>
-
-            <div class="col col-6"><h2>Currency Conversion</h2>
-                <form id="convert">
-                    <div class="form-group">
-                        <label for="convert-base-currency">Base Currency</label>
-                        <select class="form-control" id="convert-base-currency">
-                            <option value="USD">USD</option>
-                        </select>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="convert-target-currency">Target Currency</label>
-                        <select class="form-control" id="convert-target-currency">
-                            <option value="USD">USD</option>
-                        </select>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group mt-3">
-                                <label for="convert-amount">Amount</label>
-                                <input placeholder="1.23" type="text" class="form-control" id="convert-amount">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group mt-3">
-                                <label for="convert-converted-amount">Converted amount</label>
-                                <input type="text" class="form-control" id="convert-converted-amount">
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Convert</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="api-error-toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">Error</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-
-            </div>
-            <div class="toast-body">
-
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
-<script src="js/jquery-3.6.3.min.js"></script>
-<script src="js/bootstrap.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
